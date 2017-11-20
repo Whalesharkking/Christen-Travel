@@ -41,44 +41,53 @@ namespace ChristenTravelGui
             {
                 String stationFrom;
                 String stationTo;
-                String departure;
-              
-                if (comboBoxFrom.Text != null && (comboBoxTo.Items.Count >=1))
-                {
-             
-                    List<SearchedConnection> searchedConnectionList = new List<SearchedConnection>();
-                    List<Connection> connections = transport.GetConnections(comboBoxFrom.Text, comboBoxTo.Text).ConnectionList;
+                String departure; 
+                if (textBoxFrom.Text != "" && (textBoxTo.Text != "" && textBoxTo.Text != "Ort, Haltestelle"))
+                {  
                     DateTime dt = dateTimePickerDepartTimeAndDate.Value.Date + dateTimePickerDepartTimeAndDate.Value.TimeOfDay;
-                    setGeoLocationFromStation(transport.GetStations(comboBoxFrom.Text).StationList[0]);
-                    
+                    List<SearchedConnection> searchedConnectionList = new List<SearchedConnection>();
+                    List<Connection> connections = transport.GetConnections(textBoxFrom.Text, textBoxTo.Text,dt.ToString("dd.MM.yyyy H:mm")).ConnectionList;
                     foreach (var connection in connections)
-                    {
-           
-                        if (dt < formatStringToDate(connection.From.Departure)) { 
+                    { 
                         stationFrom = connection.From.Station.Name;
+                       
                         stationTo = connection.To.Station.Name;
                         departure = formatDateToString(connection.From.Departure);
                         String arrivel = formatDateToString(connection.To.Arrival);
                         String travelTime = getTravelTime(connection);
+
                         if (stationFrom != null && stationTo != null && departure != null && arrivel != null)
                         {
-                            searchedConnectionList.Add(new SearchedConnection(stationFrom, stationTo, departure, arrivel, travelTime));
                             
-                        }
+                            searchedConnectionList.Add(new SearchedConnection(stationFrom, stationTo, departure, arrivel, travelTime));
+                            setGeoLocationFromStation(connection.From.Station);
                         }
                     }
                     dataGridAddElements(searchedConnectionList);
+                  
                 }
                 else
-                {
-                  
-                    Station stc = transport.GetStations(comboBoxFrom.Text).StationList[0];
+                {      
+                    string id = null;
+                 
+                    DateTime dt = dateTimePickerDepartTimeAndDate.Value.Date + dateTimePickerDepartTimeAndDate.Value.TimeOfDay;
+                    List<Station> stc = transport.GetStations(textBoxFrom.Text).StationList;
                     List<ConnectionFromStationBoard> connectionsFromStationBoard = new List<ConnectionFromStationBoard>();
-                    List<StationBoard> sctt = transport.GetStationBoard(comboBoxFrom.Text, stc.Id).Entries;
-                    setGeoLocationFromStation(stc);
+                    foreach(Station sten in stc)
+                    {
+                       
+                        if (sten.Name == textBoxFrom.Text)
+                        {
+                            setGeoLocationFromStation(sten);
+                            id = sten.Id;
+                        }
+                    }
+
+                    List<StationBoard> sctt = transport.GetStationBoard(textBoxFrom.Text, id).Entries;
+                 
                     foreach (StationBoard stt in sctt)
                     {
-                        stationFrom = comboBoxFrom.Text;
+                        stationFrom = textBoxFrom.Text;
                         stationTo = stt.To;
                         departure = stt.Stop.Departure.ToString();
                         String busNumber = stt.Number;
@@ -89,6 +98,7 @@ namespace ChristenTravelGui
             }
             catch (Exception exc)
             {
+                MessageBox.Show(exc.Message);
                 Console.WriteLine("{0} Exception caught.", exc);
             }
 
@@ -108,6 +118,9 @@ namespace ChristenTravelGui
             gMapControl1.MaxZoom = 24;
             gMapControl1.Zoom = 9;
             gMapControl1.AutoScroll = true;
+      
+
+
         }
 
       
@@ -126,6 +139,7 @@ namespace ChristenTravelGui
         /// <returns></returns>
         private string formatDateToString(string date)
         {
+           
             // 2017 - 11 - 18T15: 44:00 + 0100 TO "dd.MM.yyyy H:mm"
             DateTime dt = DateTime.Parse(date.Replace('-', '/').Replace('T', ' ').Substring(0, date.LastIndexOf('+')));
         
@@ -153,56 +167,36 @@ namespace ChristenTravelGui
                  
   
         var element = searchedConnectionList.FirstOrDefault();
-            int i = 1;
+            int i = 0;
             dataGridVShowConnection.DataSource = searchedConnectionList;
-            dataGridVShowConnection.Columns[0].HeaderText = "Von";
-            dataGridVShowConnection.Columns[i++].HeaderText = "Nach";
-            dataGridVShowConnection.Columns[i++].HeaderText = "Abfahrt";
+            dataGridVShowConnection.Columns[i].HeaderText = "Von";
+            dataGridVShowConnection.Columns[++i].HeaderText = "Nach";
+            dataGridVShowConnection.Columns[++i].HeaderText = "Abfahrt";
             if (element is SearchedConnection)
             {
-                dataGridVShowConnection.Columns[i++].HeaderText = "Ankunft";
-                dataGridVShowConnection.Columns[i++].HeaderText = "Dauer";
+                dataGridVShowConnection.Columns[++i].HeaderText = "Ankunft";
+                dataGridVShowConnection.Columns[++i].HeaderText = "Dauer";
             }
             if (element is ConnectionFromStationBoard)
             {
-                dataGridVShowConnection.Columns[i++].HeaderText = "Nummer";
+                dataGridVShowConnection.Columns[++i].HeaderText = "Nummer";
             }
             dataGridVShowConnection.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridVShowConnection.RowHeadersVisible = false;
 
         }
-        /// <summary>
-        /// TextChanged Event comboBoxFrom
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void comboBoxFrom_TextChanged(object sender, EventArgs e)
-        {
-            autoCompleteSearch(comboBoxFrom);
-           
-        }
-        /// <summary>
-        /// TextChanged Event comboBoxTo
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void comboBoxTo_TextChanged(object sender, EventArgs e)
-        {
-            autoCompleteSearch(comboBoxTo);
-        }
+      
+       
 
-        private void autoCompleteSearch(ComboBox comboBox)
+        private void autoCompleteSearch(ComboBox comboBox, TextBox textBox)
         {
-
+            comboBox.Items.Clear();
             try
             {
-
-                if (comboBox.Text.Count() >= 4)
+                if (textBox.Text.Count() >= 4)
                 {
-                    comboBoxFrom.SelectionStart = comboBoxFrom.Text.Length; // add some logic if length is 0
-                    comboBoxFrom.SelectionLength = 0;
 
-                    List<Station> stc = transport.GetStations(comboBox.Text).StationList;
+                    List<Station> stc = transport.GetStations(textBox.Text).StationList;
 
                     foreach (Station stt in stc)
                     {
@@ -213,32 +207,86 @@ namespace ChristenTravelGui
                     comboBox.DroppedDown = true;
 
                 }
-                else
-                {
-                    for (int i = 0; i <= comboBox.Items.Count -1; i++)
-                    {
-                        comboBox.Items.RemoveAt(i);
-                    }
-                }
-                
-               
             }
             catch (Exception exc)
             {
-                Console.WriteLine("{0} Exception caught.", exc);
             }
         }
 
-        private void comboBoxFrom_Click(object sender, EventArgs e)
+      
+
+        private void textBoxFrom_TextChanged(object sender, EventArgs e)
         {
-            comboBoxFrom.Text = null;
+            autoCompleteSearch(comboBoxFrom, textBoxFrom);
+
         }
 
-        private void comboBoxTo_Click(object sender, EventArgs e)
+        private void textBoxTo_TextChanged(object sender, EventArgs e)
         {
-            comboBoxTo.Text = null;
+            autoCompleteSearch(comboBoxTo, textBoxTo);
+
         }
 
+      
 
+        private void textBoxFrom_KeyDown(object sender, KeyEventArgs e)
+        {
+            checkIfKeyDownIsDown( comboBoxFrom,e);
+          
+            
+        }
+
+        private void checkIfKeyDownIsDown( ComboBox comboBox, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down)
+            {
+                comboBox.Focus();
+                comboBox.SelectedIndex = 0;
+                
+            }
+        }
+
+        private void textBoxTo_KeyDown(object sender, KeyEventArgs e)
+        {
+            checkIfKeyDownIsDown(comboBoxTo, e);
+
+        }
+
+        private void comboBoxFrom_KeyDown(object sender, KeyEventArgs e)
+        {
+            keyDownEvent(e, textBoxFrom, comboBoxFrom);
+        
+        }
+        private void comboBoxTo_KeyDown(object sender, KeyEventArgs e)
+        {
+            keyDownEvent(e, textBoxTo, comboBoxTo);
+        }
+
+        private void keyDownEvent(KeyEventArgs e, TextBox textBox, ComboBox comboBox)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+
+                textBox.Text = comboBox.SelectedItem.ToString();
+                textBox.Focus();
+
+
+            }
+        }
+
+ 
+
+
+        private void textBoxFrom_Click(object sender, EventArgs e)
+        {
+            textBoxFrom.Text = null;
+            
+
+        }
+
+        private void textBoxTo_Click_1(object sender, EventArgs e)
+        {
+            textBoxTo.Text = null;
+        }
     }
 }

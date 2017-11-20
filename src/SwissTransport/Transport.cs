@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 
@@ -15,7 +16,7 @@ namespace SwissTransport
             if (responseStream != null)
             {
                 var message = new StreamReader(responseStream).ReadToEnd();
-                var stations = JsonConvert.DeserializeObject<Stations>(message);
+                var stations = JsonConvert.DeserializeObject<Stations>(message, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 return stations;
             }
 
@@ -39,9 +40,29 @@ namespace SwissTransport
             return null;
         }
 
-        public Connections GetConnections(string fromStation, string toStattion)
+        public Connections GetConnections(string fromStation, string toStattion )
         {
+
             var request = CreateWebRequest("http://transport.opendata.ch/v1/connections?from=" + fromStation + "&to=" + toStattion);
+            return getConnection(request);
+            
+        }
+
+        public object GetConnectionsWithTimeFilter(string text1, string text2, string v)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Connections GetConnections(string fromStation, string toStattion, string dateTime)
+        {
+
+          var request = CreateWebRequest("http://transport.opendata.ch/v1/connections?from=" + fromStation + "&to=" + toStattion + "&datetime="+dateTime +"&limt="+5);
+          return  getConnection(request);
+        
+        }
+
+        private Connections getConnection(WebRequest request)
+        {
             var response = request.GetResponse();
             var responseStream = response.GetResponseStream();
 
@@ -49,11 +70,13 @@ namespace SwissTransport
             {
                 var readToEnd = new StreamReader(responseStream).ReadToEnd();
                 var connections =
-                    JsonConvert.DeserializeObject<Connections>(readToEnd);
+                  JsonConvert.DeserializeObject<Connections>(readToEnd,
+                  new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 return connections;
             }
 
             return null;
+
         }
 
         private static WebRequest CreateWebRequest(string url)
@@ -66,5 +89,7 @@ namespace SwissTransport
             
             return request;
         }
+
+   
     }
 }
