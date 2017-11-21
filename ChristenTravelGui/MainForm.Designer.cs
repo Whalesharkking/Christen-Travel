@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.groupBoxInputAndSurche = new System.Windows.Forms.GroupBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.textBoxTo = new System.Windows.Forms.TextBox();
             this.textBoxFrom = new System.Windows.Forms.TextBox();
             this.comboBoxTo = new System.Windows.Forms.ComboBox();
@@ -47,6 +48,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.gMapControl1 = new GMap.NET.WindowsForms.GMapControl();
             this.groupBoxInputAndSurche.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBoxResult.SuspendLayout();
             this.tabControlSwitch.SuspendLayout();
@@ -57,6 +59,7 @@
             // 
             // groupBoxInputAndSurche
             // 
+            this.groupBoxInputAndSurche.Controls.Add(this.pictureBox2);
             this.groupBoxInputAndSurche.Controls.Add(this.textBoxTo);
             this.groupBoxInputAndSurche.Controls.Add(this.textBoxFrom);
             this.groupBoxInputAndSurche.Controls.Add(this.comboBoxTo);
@@ -74,6 +77,17 @@
             this.groupBoxInputAndSurche.Size = new System.Drawing.Size(1059, 216);
             this.groupBoxInputAndSurche.TabIndex = 0;
             this.groupBoxInputAndSurche.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pictureBox2.Location = new System.Drawing.Point(977, 13);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(75, 74);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox2.TabIndex = 11;
+            this.pictureBox2.TabStop = false;
+            this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
             // 
             // textBoxTo
             // 
@@ -128,7 +142,7 @@
             // 
             this.buttonShowConnections.BackColor = System.Drawing.SystemColors.Control;
             this.buttonShowConnections.ForeColor = System.Drawing.Color.Black;
-            this.buttonShowConnections.Location = new System.Drawing.Point(561, 131);
+            this.buttonShowConnections.Location = new System.Drawing.Point(561, 128);
             this.buttonShowConnections.Margin = new System.Windows.Forms.Padding(4);
             this.buttonShowConnections.Name = "buttonShowConnections";
             this.buttonShowConnections.Size = new System.Drawing.Size(399, 52);
@@ -150,12 +164,14 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(473, 56);
+            this.pictureBox1.Location = new System.Drawing.Point(469, 44);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(44, 32);
+            this.pictureBox1.Size = new System.Drawing.Size(56, 52);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // labelTo
             // 
@@ -267,11 +283,13 @@
             this.Controls.Add(this.groupBoxInputAndSurche);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "Christen-Travel";
             this.groupBoxInputAndSurche.ResumeLayout(false);
             this.groupBoxInputAndSurche.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBoxResult.ResumeLayout(false);
             this.tabControlSwitch.ResumeLayout(false);
@@ -301,6 +319,7 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TextBox textBoxFrom;
         private System.Windows.Forms.TextBox textBoxTo;
+        private System.Windows.Forms.PictureBox pictureBox2;
     }
 }
 

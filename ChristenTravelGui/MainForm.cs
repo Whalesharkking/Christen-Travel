@@ -12,6 +12,7 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
+
 namespace ChristenTravelGui
 {
     public partial class MainForm : Form
@@ -47,21 +48,21 @@ namespace ChristenTravelGui
                     DateTime dt = dateTimePickerDepartTimeAndDate.Value.Date + dateTimePickerDepartTimeAndDate.Value.TimeOfDay;
                     List<SearchedConnection> searchedConnectionList = new List<SearchedConnection>();
                     List<Connection> connections = transport.GetConnections(textBoxFrom.Text, textBoxTo.Text,dt.ToString("dd.MM.yyyy H:mm")).ConnectionList;
-                    foreach (var connection in connections)
-                    { 
+                    foreach (var connection in connections) {
+                        if (formatStringToDate(connection.From.Departure) > dt) { 
                         stationFrom = connection.From.Station.Name;
-                       
+
                         stationTo = connection.To.Station.Name;
                         departure = formatDateToString(connection.From.Departure);
                         String arrivel = formatDateToString(connection.To.Arrival);
                         String travelTime = getTravelTime(connection);
 
-                        if (stationFrom != null && stationTo != null && departure != null && arrivel != null)
-                        {
-                            
+                        if (stationFrom != null && stationTo != null && departure != null && arrivel != null) {
+
                             searchedConnectionList.Add(new SearchedConnection(stationFrom, stationTo, departure, arrivel, travelTime));
                             setGeoLocationFromStation(connection.From.Station);
                         }
+                    }
                     }
                     dataGridAddElements(searchedConnectionList);
                   
@@ -104,7 +105,10 @@ namespace ChristenTravelGui
 
 
         }
-
+        /// <summary>
+        /// Show the Station Location on a Map
+        /// </summary>
+        /// <param name="stc"></param>
         private void setGeoLocationFromStation(Station stc)
         {
          Coordinate c=   stc.Coordinate;
@@ -124,7 +128,11 @@ namespace ChristenTravelGui
         }
 
       
-
+        /// <summary>
+        /// Format a String to a Date
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
         private DateTime formatStringToDate(string date)
         {
             // 2017 - 11 - 18T15: 44:00 + 0100 TO "dd.MM.yyyy H:mm"
@@ -187,7 +195,11 @@ namespace ChristenTravelGui
         }
       
        
-
+        /// <summary>
+        /// In this Method I make to Auto Complete of the input Text
+        /// </summary>
+        /// <param name="comboBox"></param>
+        /// <param name="textBox"></param>
         private void autoCompleteSearch(ComboBox comboBox, TextBox textBox)
         {
             comboBox.Items.Clear();
@@ -235,7 +247,11 @@ namespace ChristenTravelGui
           
             
         }
-
+        /// <summary>
+        /// Check if the Key "Down" is pressed
+        /// </summary>
+        /// <param name="comboBox"></param>
+        /// <param name="e"></param>
         private void checkIfKeyDownIsDown( ComboBox comboBox, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down)
@@ -261,7 +277,12 @@ namespace ChristenTravelGui
         {
             keyDownEvent(e, textBoxTo, comboBoxTo);
         }
-
+        /// <summary>
+        /// Check if the Key "Delete" is pressed
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="textBox"></param>
+        /// <param name="comboBox"></param>
         private void keyDownEvent(KeyEventArgs e, TextBox textBox, ComboBox comboBox)
         {
             if (e.KeyCode == Keys.Enter)
@@ -276,17 +297,42 @@ namespace ChristenTravelGui
 
  
 
-
+        /// <summary>
+        /// Set the TextBoxFrom Value to Null if I select it
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textBoxFrom_Click(object sender, EventArgs e)
         {
             textBoxFrom.Text = null;
             
 
         }
-
+        /// <summary>
+        /// Set the TextBoxTo Value to Null if I select it
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textBoxTo_Click_1(object sender, EventArgs e)
         {
             textBoxTo.Text = null;
         }
+
+        private void pictureBox2_Click(object sender, EventArgs e) {
+            HelpForm helpForm = new HelpForm(this);
+            this.Enabled = false;
+            helpForm.Show();
+           
+          
+
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e) {
+            string textBoxFromText = textBoxFrom.Text;
+            string textBoxToText = textBoxTo.Text;
+            textBoxFrom.Text = textBoxToText;
+            textBoxTo.Text = textBoxFromText;
+        }
     }
-}
+    }
+
